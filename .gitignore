@@ -36,3 +36,32 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+*.class
+
+#package file
+
+*.war
+*.ear
+
+#kdiff3 ignore
+*.orig
+
+#eclipse ignore
+.settings/
+.classpatch
+
+#idea
+.idea/
+/idea/
+
+# temp file
+
+*.log
+*.cache
+*.diff
+*.patch
+*.tmp
+
+# system ignore
+Thumbs.db
