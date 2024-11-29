@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mmall.dao.PayInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.mmall.pojo.PayInfo" >
+    <constructor >
+      <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="userId" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="orderNo" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="payPlatform" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="platformNumber" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="platformStatus" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="createTime" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="updateTime" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, userId, orderNo, payPlatform, platformNumber, platformStatus, createTime, updateTime
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from mmall_pay_info
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from mmall_pay_info
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.mmall.pojo.PayInfo" >
+    insert into mmall_pay_info (id, userId, orderNo, 
+      payPlatform, platformNumber, platformStatus, 
+      createTime, updateTime)
+    values (#{id,jdbcType=BIGINT}, #{userid,jdbcType=INTEGER}, #{orderno,jdbcType=BIGINT}, 
+      #{payplatform,jdbcType=INTEGER}, #{platformnumber,jdbcType=VARCHAR}, #{platformstatus,jdbcType=VARCHAR},
+      now(), now())
+  </insert>
+  <insert id="insertSelective" parameterType="com.mmall.pojo.PayInfo" >
+    insert into mmall_pay_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userid != null" >
+        userId,
+      </if>
+      <if test="orderno != null" >
+        orderNo,
+      </if>
+      <if test="payplatform != null" >
+        payPlatform,
+      </if>
+      <if test="platformnumber != null" >
+        platformNumber,
+      </if>
+      <if test="platformstatus != null" >
+        platformStatus,
+      </if>
+      <if test="createtime != null" >
+        createTime,
+      </if>
+      <if test="updatetime != null" >
+        updateTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="orderno != null" >
+        #{orderno,jdbcType=BIGINT},
+      </if>
+      <if test="payplatform != null" >
+        #{payplatform,jdbcType=INTEGER},
+      </if>
+      <if test="platformnumber != null" >
+        #{platformnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="platformstatus != null" >
+        #{platformstatus,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        now(),
+      </if>
+      <if test="updatetime != null" >
+        now(),
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.mmall.pojo.PayInfo" >
+    update mmall_pay_info
+    <set >
+      <if test="userid != null" >
+        userId = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="orderno != null" >
+        orderNo = #{orderno,jdbcType=BIGINT},
+      </if>
+      <if test="payplatform != null" >
+        payPlatform = #{payplatform,jdbcType=INTEGER},
+      </if>
+      <if test="platformnumber != null" >
+        platformNumber = #{platformnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="platformstatus != null" >
+        platformStatus = #{platformstatus,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatetime != null" >
+        updateTime = now(),
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.mmall.pojo.PayInfo" >
+    update mmall_pay_info
+    set userId = #{userid,jdbcType=INTEGER},
+      orderNo = #{orderno,jdbcType=BIGINT},
+      payPlatform = #{payplatform,jdbcType=INTEGER},
+      platformNumber = #{platformnumber,jdbcType=VARCHAR},
+      platformStatus = #{platformstatus,jdbcType=VARCHAR},
+      createTime = #{createtime,jdbcType=TIMESTAMP},
+      updateTime = now()
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

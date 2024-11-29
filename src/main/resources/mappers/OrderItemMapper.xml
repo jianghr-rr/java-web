@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mmall.dao.OrderItemMapper" >
+  <resultMap id="BaseResultMap" type="com.mmall.pojo.OrderItem" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="userId" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="orderNo" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="productId" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="productName" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="productImage" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="currentUnitPrice" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
+      <arg column="quantity" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="totalPrice" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
+      <arg column="createTime" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="updateTime" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, userId, orderNo, productId, productName, productImage, currentUnitPrice, quantity, 
+    totalPrice, createTime, updateTime
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from mmall_order_item
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from mmall_order_item
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.mmall.pojo.OrderItem" >
+    insert into mmall_order_item (id, userId, orderNo, 
+      productId, productName, productImage, 
+      currentUnitPrice, quantity, totalPrice, 
+      createTime, updateTime)
+    values (#{id,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{orderno,jdbcType=BIGINT}, 
+      #{productid,jdbcType=INTEGER}, #{productname,jdbcType=VARCHAR}, #{productimage,jdbcType=VARCHAR}, 
+      #{currentunitprice,jdbcType=DECIMAL}, #{quantity,jdbcType=INTEGER}, #{totalprice,jdbcType=DECIMAL},
+            now(),now())
+  </insert>
+  <insert id="insertSelective" parameterType="com.mmall.pojo.OrderItem" >
+    insert into mmall_order_item
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userid != null" >
+        userId,
+      </if>
+      <if test="orderno != null" >
+        orderNo,
+      </if>
+      <if test="productid != null" >
+        productId,
+      </if>
+      <if test="productname != null" >
+        productName,
+      </if>
+      <if test="productimage != null" >
+        productImage,
+      </if>
+      <if test="currentunitprice != null" >
+        currentUnitPrice,
+      </if>
+      <if test="quantity != null" >
+        quantity,
+      </if>
+      <if test="totalprice != null" >
+        totalPrice,
+      </if>
+      <if test="createtime != null" >
+        createTime,
+      </if>
+      <if test="updatetime != null" >
+        updateTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="orderno != null" >
+        #{orderno,jdbcType=BIGINT},
+      </if>
+      <if test="productid != null" >
+        #{productid,jdbcType=INTEGER},
+      </if>
+      <if test="productname != null" >
+        #{productname,jdbcType=VARCHAR},
+      </if>
+      <if test="productimage != null" >
+        #{productimage,jdbcType=VARCHAR},
+      </if>
+      <if test="currentunitprice != null" >
+        #{currentunitprice,jdbcType=DECIMAL},
+      </if>
+      <if test="quantity != null" >
+        #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="totalprice != null" >
+        #{totalprice,jdbcType=DECIMAL},
+      </if>
+      <if test="createtime != null" >
+        now(),
+      </if>
+      <if test="updatetime != null" >
+        now(),
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.mmall.pojo.OrderItem" >
+    update mmall_order_item
+    <set >
+      <if test="userid != null" >
+        userId = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="orderno != null" >
+        orderNo = #{orderno,jdbcType=BIGINT},
+      </if>
+      <if test="productid != null" >
+        productId = #{productid,jdbcType=INTEGER},
+      </if>
+      <if test="productname != null" >
+        productName = #{productname,jdbcType=VARCHAR},
+      </if>
+      <if test="productimage != null" >
+        productImage = #{productimage,jdbcType=VARCHAR},
+      </if>
+      <if test="currentunitprice != null" >
+        currentUnitPrice = #{currentunitprice,jdbcType=DECIMAL},
+      </if>
+      <if test="quantity != null" >
+        quantity = #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="totalprice != null" >
+        totalPrice = #{totalprice,jdbcType=DECIMAL},
+      </if>
+      <if test="createtime != null" >
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatetime != null" >
+        updateTime = now(),
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.mmall.pojo.OrderItem" >
+    update mmall_order_item
+    set userId = #{userid,jdbcType=INTEGER},
+      orderNo = #{orderno,jdbcType=BIGINT},
+      productId = #{productid,jdbcType=INTEGER},
+      productName = #{productname,jdbcType=VARCHAR},
+      productImage = #{productimage,jdbcType=VARCHAR},
+      currentUnitPrice = #{currentunitprice,jdbcType=DECIMAL},
+      quantity = #{quantity,jdbcType=INTEGER},
+      totalPrice = #{totalprice,jdbcType=DECIMAL},
+      createTime = #{createtime,jdbcType=TIMESTAMP},
+      updateTime = now()
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
