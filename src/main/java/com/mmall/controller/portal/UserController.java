@@ -4,8 +4,11 @@ import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
+import com.mmall.service.dto.user.LoginRequestDTO;
+import com.mmall.service.dto.user.RegisterRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,15 +24,14 @@ public class UserController {
 
     /**
      * 用户登录
-     * @param username
-     * @param password
+     * @param loginRequestDTO
      * @param session
      */
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody // 自动序列化成JSON
-    public ServerResponse<User> login(String username, String password, HttpSession session) {
+    public ServerResponse<User> login(@RequestBody LoginRequestDTO loginRequestDTO, HttpSession session) {
         // service -> mybatis -> dao
-        ServerResponse<User> response = iUserService.login(username, password);
+        ServerResponse<User> response = iUserService.login(loginRequestDTO.getUsername(), loginRequestDTO.getPassword());
         if (response.isSuccess()) {
             session.setAttribute(Const.CURRENT_USER, response.getData());
         }
@@ -45,7 +47,14 @@ public class UserController {
 
     @RequestMapping(value = "register.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> register(User user) {
+    public ServerResponse<String> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
+        User user = new User();
+        user.setUsername(registerRequestDTO.getUsername());
+        user.setPassword(registerRequestDTO.getPassword());
+        user.setEmail(registerRequestDTO.getEmail());
+        user.setPhone(registerRequestDTO.getPhone());
+        user.setQuestion(registerRequestDTO.getQuestion());
+        user.setAnswer(registerRequestDTO.getAnswer());
         return iUserService.register(user);
     }
 

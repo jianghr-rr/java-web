@@ -56,10 +56,10 @@ public class UserServiceImpl implements IUserService {
         user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
 
         int resultCount = userMapper.insert(user);
-        if(resultCount == 0){
-            return ServerResponse.createByError("注册失败");
+        if(resultCount == 1){
+            return ServerResponse.createBySuccessMessage("注册成功");
         }
-        return ServerResponse.createBySuccessMessage("注册成功");
+        return ServerResponse.createByError("注册失败");
     }
 
     public ServerResponse<String> checkValid(String str, String type) {

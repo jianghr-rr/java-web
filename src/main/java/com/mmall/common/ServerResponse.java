@@ -1,11 +1,11 @@
 package com.mmall.common;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.io.Serializable;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL) // 为null的字段不给前端
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)// 为null的字段不给前端
 public class ServerResponse<T> implements Serializable {
 
     private final int status;
