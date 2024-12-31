@@ -5,12 +5,19 @@ import com.mmall.common.ServerResponse;
 import com.mmall.common.TokenCache;
 import com.mmall.dao.UserMapper;
 import com.mmall.pojo.User;
+import com.mmall.service.dto.user.ResetPasswordDTO;
+import com.mmall.service.dto.user.UpdateInformationDTO;
+import com.mmall.util.CookieUtil;
+import com.mmall.util.JwtUtil;
 import com.mmall.util.MD5Util;
 import com.mmall.service.IUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 @Service("iUserService")
@@ -18,6 +25,12 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    private final HttpServletRequest request;
+
+    public UserServiceImpl(HttpServletRequest request) {
+        this.request = request;
+    }
 
     @Override
     public ServerResponse<User> login(String username, String password) {
@@ -37,6 +50,12 @@ public class UserServiceImpl implements IUserService {
 
         // ??? 为什么要设置为空
         user.setPassword(org.apache.commons.lang3.StringUtils.EMPTY);
+
+        // 设置jwt
+        String token = JwtUtil.generateToken(username);
+        // 设置 Cookie
+        CookieUtil.setAuthTokenCookie(token);
+
         return ServerResponse.createBySuccess("登录成功",user);
     }
 
@@ -128,7 +147,7 @@ public class UserServiceImpl implements IUserService {
             int rowCount = userMapper.updatePasswordByUsername(username, md5Password);
 
             if(rowCount > 0){
-                return ServerResponse.createBySuccessMessage("修改密码成功");
+                return ServerResponse.createBySuccess("修改密码成功", "修改密码成功");
             }
         }
         else {
@@ -138,17 +157,32 @@ public class UserServiceImpl implements IUserService {
     }
 
     // 登录时的重置密码
-    public ServerResponse<String> resetPassword(String passwordOld, String passwordNew, User user) {
+    public ServerResponse<User> resetPassword(ResetPasswordDTO resetPasswordDTO) {
         //防止横向越权,要校验一下这个用户的旧密码,一定要指定是这个用户.因为我们会查询一个count(1),如果不指定id,那么结果就是true啦count>0;
-        int resultCount = userMapper.checkPassword(MD5Util.MD5EncodeUtf8(passwordOld), user.getId());
+//        int resultCount = userMapper.checkPassword(MD5Util.MD5EncodeUtf8(passwordOld), user.getId());
+//        if(resultCount == 0){
+//            return ServerResponse.createByError("旧密码错误");
+//        }
+//
+//        user.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
+//        int updateCount = userMapper.updateByPrimaryKeySelective(user);
+//        if(updateCount > 0){
+//            return ServerResponse.createBySuccessMessage("密码更新成功");
+//        }
+//        return ServerResponse.createByError("密码更新失败");
+
+        String username = (String) request.getAttribute("username");
+        User user = userMapper.selectByUsername(username);
+        int resultCount = userMapper.checkPassword(MD5Util.MD5EncodeUtf8(resetPasswordDTO.getPasswordOld()), user.getId());
+
         if(resultCount == 0){
             return ServerResponse.createByError("旧密码错误");
         }
 
-        user.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
+        user.setPassword(MD5Util.MD5EncodeUtf8(resetPasswordDTO.getPasswordNew()));
         int updateCount = userMapper.updateByPrimaryKeySelective(user);
         if(updateCount > 0){
-            return ServerResponse.createBySuccessMessage("密码更新成功");
+            return ServerResponse.createBySuccess("密码更新成功", user);
         }
         return ServerResponse.createByError("密码更新失败");
     }
@@ -156,17 +190,35 @@ public class UserServiceImpl implements IUserService {
     // 更新用户信息
     // username不能被更新
     // 校验新的email
-    public ServerResponse<User> updateInformation(User user) {
-        int resultCount = userMapper.checkEmailByUserId(user.getEmail(),user.getId());
+    public ServerResponse<User> updateInformation(UpdateInformationDTO updateInformationDTO) {
+//        int resultCount = userMapper.checkEmailByUserId(user.getEmail(),user.getId());
+//        if(resultCount > 0){
+//            return ServerResponse.createByError("email已存在,请更换email再尝试更新");
+//        }
+//        User updateUser = new User();
+//        updateUser.setId(user.getId());
+//        updateUser.setEmail(user.getEmail());
+//        updateUser.setPhone(user.getPhone());
+//        updateUser.setQuestion(user.getQuestion());
+//        updateUser.setAnswer(user.getAnswer());
+//
+//        int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
+//        if(updateCount > 0){
+//            return ServerResponse.createBySuccess("更新个人信息成功",updateUser);
+//        }
+
+        String username = (String) request.getAttribute("username");
+        User user = userMapper.selectByUsername(username);
+        int resultCount = userMapper.checkEmailByUserId(updateInformationDTO.getEmail(),user.getId());
         if(resultCount > 0){
             return ServerResponse.createByError("email已存在,请更换email再尝试更新");
         }
         User updateUser = new User();
         updateUser.setId(user.getId());
-        updateUser.setEmail(user.getEmail());
-        updateUser.setPhone(user.getPhone());
-        updateUser.setQuestion(user.getQuestion());
-        updateUser.setAnswer(user.getAnswer());
+        updateUser.setEmail(updateInformationDTO.getEmail());
+        updateUser.setPhone(updateInformationDTO.getPhone());
+        updateUser.setQuestion(updateInformationDTO.getQuestion());
+        updateUser.setAnswer(updateInformationDTO.getAnswer());
 
         int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
         if(updateCount > 0){
@@ -177,6 +229,17 @@ public class UserServiceImpl implements IUserService {
 
     public ServerResponse<User> getInfomation(int userId) {
         User user = userMapper.selectByPrimaryKey(userId);
+        if(user == null){
+            return ServerResponse.createByError("找不到当前用户");
+        }
+        user.setPassword(org.apache.commons.lang3.StringUtils.EMPTY);
+        return ServerResponse.createBySuccess(user);
+    }
+
+    public ServerResponse<User> getUserInfo() {
+        String username = (String) request.getAttribute("username");
+        User user = userMapper.selectByUsername(username);
+
         if(user == null){
             return ServerResponse.createByError("找不到当前用户");
         }

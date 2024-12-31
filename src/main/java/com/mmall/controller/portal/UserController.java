@@ -4,8 +4,8 @@ import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
-import com.mmall.service.dto.user.LoginRequestDTO;
-import com.mmall.service.dto.user.RegisterRequestDTO;
+import com.mmall.service.dto.user.*;
+import com.mmall.util.CookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +42,8 @@ public class UserController {
     @ResponseBody
     public ServerResponse<String> logout(HttpSession session) {
         session.removeAttribute(Const.CURRENT_USER);
-        return ServerResponse.createBySuccess();
+        CookieUtil.clearCookie();
+        return ServerResponse.createBySuccess("登出成功", "logout");
     }
 
     @RequestMapping(value = "register.do", method = RequestMethod.POST)
@@ -67,12 +68,8 @@ public class UserController {
     // 获取用户信息
     @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> getUserInfo(HttpSession session){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return ServerResponse.createBySuccess(user);
-        }
-        return ServerResponse.createByError("获取用户信息失败");
+    public ServerResponse<User> getUserInfo(){
+        return iUserService.getUserInfo();
     }
 
     // 忘记密码
@@ -85,48 +82,50 @@ public class UserController {
     // 校验密码提示问题
     @RequestMapping(value = "forget_check_answer.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> forgetCheckAnswer(String username,String question,String answer){
-        return iUserService.checkAnswer(username, question, answer);
+    public ServerResponse<String> forgetCheckAnswer(@RequestBody CheckAnswerDTO checkAnswerDTO){
+        return iUserService.checkAnswer(checkAnswerDTO.getUsername(), checkAnswerDTO.getQuestion(), checkAnswerDTO.getAnswer());
     }
 
     // 忘记密码的重置密码
     @RequestMapping(value = "forget_reset_password.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> forgetRestPassword(String username,String passwordNew,String forgetToken){
-        return iUserService.forgetResetPassword(username,passwordNew,forgetToken);
+    public ServerResponse<String> forgetRestPassword(@RequestBody ForgetRestPasswordDTO forgetRestPasswordDTO){
+        return iUserService.forgetResetPassword(forgetRestPasswordDTO.getUsername(),forgetRestPasswordDTO.getPassword(),forgetRestPasswordDTO.getForgetToken());
     }
 
     // 已经登录的重置密码
     @RequestMapping(value = "reset_password.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> resetPassword(HttpSession session,String passwordOld,String passwordNew){
+    public ServerResponse<User> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO){
         // ??? 具体的拿用户信息
-        User user = (User)session.getAttribute(Const.CURRENT_USER);
-        if(user == null){
-            return ServerResponse.createByError("用户未登录");
-        }
-        return iUserService.resetPassword(passwordOld,passwordNew,user);
+//        User user = (User)session.getAttribute(Const.CURRENT_USER);
+//        if(user == null){
+//            return ServerResponse.createByError("用户未登录");
+//        }
+//        return iUserService.resetPassword(passwordOld,passwordNew,user);
+        return iUserService.resetPassword(resetPasswordDTO);
     }
 
     // 更新用户信息
     @RequestMapping(value = "update_information.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> updateInformation(HttpSession session, User user){
+    public ServerResponse<User> updateInformation(@RequestBody UpdateInformationDTO updateInformationDTO){
         // ??? 通过session拿到用户信息
-        User currentUser = (User)session.getAttribute(Const.CURRENT_USER);
-        if(currentUser == null){
-            return ServerResponse.createByError("用户未登录");
-        }
-        user.setId(currentUser.getId());
-        user.setUsername(currentUser.getUsername());
-        // 更新
-        ServerResponse<User> response = iUserService.updateInformation(user);
-        if (response.isSuccess()) {
-            // ??? 为什么要设置一次username
-            response.getData().setUsername(currentUser.getUsername());
-            session.setAttribute(Const.CURRENT_USER, response.getData());
-        }
-        return response;
+//        User currentUser = (User)session.getAttribute(Const.CURRENT_USER);
+//        if(currentUser == null){
+//            return ServerResponse.createByError("用户未登录");
+//        }
+//        user.setId(currentUser.getId());
+//        user.setUsername(currentUser.getUsername());
+//        // 更新
+//        ServerResponse<User> response = iUserService.updateInformation(user);
+//        if (response.isSuccess()) {
+//            // ??? 为什么要设置一次username
+//            response.getData().setUsername(currentUser.getUsername());
+//            session.setAttribute(Const.CURRENT_USER, response.getData());
+//        }
+//        return response;
+        return iUserService.updateInformation(updateInformationDTO);
     }
 
     // 获取用户信息
